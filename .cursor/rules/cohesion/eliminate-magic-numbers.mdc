@@ -1,0 +1,60 @@
+---
+description: Replace scattered magic numbers with centralized named constants to ensure consistent updates.
+globs: 
+alwaysApply: false
+---
+## Eliminate Magic Numbers
+
+**Rule:** Replace scattered magic numbers with centralized named constants to ensure consistent updates.
+
+**Reasoning:**
+
+- Ensures values that need to change together are modified consistently
+- Prevents inconsistencies when only some instances are updated
+- Improves maintainability and reduces bugs
+
+**Guidelines:**
+- Group related constants together
+- Use descriptive names with units
+- Update values in one central location
+
+#### Recommended Pattern:
+
+```typescript
+// constants.ts
+export const TIMEOUTS = {
+  API_REQUEST: 5000,
+  USER_INTERACTION: 3000,
+  ANIMATION: 300
+} as const;
+
+// Multiple files using the same constant
+function apiCall() {
+  return fetch(url, { 
+    signal: AbortSignal.timeout(TIMEOUTS.API_REQUEST) 
+  });
+}
+
+function showToast() {
+  setTimeout(hideToast, TIMEOUTS.USER_INTERACTION);
+}
+```
+
+#### Avoid:
+
+```typescript
+// Scattered magic numbers
+function apiCall() {
+  return fetch(url, { 
+    signal: AbortSignal.timeout(5000) // Magic number
+  });
+}
+
+function showToast() {
+  setTimeout(hideToast, 5000); // Same value, but disconnected
+}
+
+function anotherFunction() {
+  delay(5000); // Risk of inconsistent updates
+}
+```

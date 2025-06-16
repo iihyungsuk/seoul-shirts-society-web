@@ -1,0 +1,49 @@
+---
+description: xtract complex conditional logic into named variables that clearly express intent.
+globs: 
+alwaysApply: false
+---
+## Name Complex Conditions
+
+**Rule:** Extract complex conditional logic into named variables that clearly express intent.
+
+**Reasoning:**
+
+- Reduces the number of contexts readers need to consider simultaneously
+- Makes code intent explicit and self-documenting
+- Improves maintainability and debugging
+
+**When to name conditions:**
+- Complex logic over multiple lines
+- Reusable logic
+- Logic that needs unit testing
+
+#### Recommended Pattern:
+
+```typescript
+const matchedProducts = products.filter((product) => {
+  return product.categories.some((category) => {
+    const isSameCategory = category.id === targetCategory.id;
+    const isPriceInRange = product.prices.some(
+      (price) => price >= minPrice && price <= maxPrice
+    );
+
+    return isSameCategory && isPriceInRange;
+  });
+});
+```
+
+#### Avoid:
+
+```typescript
+// Complex nested conditions without clear intent
+const result = products.filter((product) =>
+  product.categories.some(
+    (category) =>
+      category.id === targetCategory.id &&
+      product.prices.some(
+        (price) => price >= minPrice && price <= maxPrice
+      )
+  )
+);
+```

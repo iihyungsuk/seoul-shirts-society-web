@@ -1,0 +1,104 @@
+---
+description: Extract complex implementation details into separate components or functions to reduce cognitive load.
+globs: 
+alwaysApply: false
+---
+## Abstract Implementation Details
+
+**Rule:** Extract complex implementation details into separate components or functions to reduce cognitive load.
+
+**Reasoning:**
+
+- Limits the number of contexts a person needs to consider while reading code
+- Improves readability by hiding unnecessary implementation details
+- Prevents logic dependencies between separated concerns
+
+#### Recommended Pattern 1: Auth Guard
+
+(Login check abstracted to a wrapper/guard component)
+
+```tsx
+// App structure
+function App() {
+  return (
+    <AuthGuard>
+      {" "}
+      {/* Wrapper handles auth check */}
+      <LoginStartPage />
+    </AuthGuard>
+  );
+}
+
+// AuthGuard component encapsulates the check/redirect logic
+function AuthGuard({ children }) {
+  const status = useCheckLoginStatus();
+  useEffect(() => {
+    if (status === "LOGGED_IN") {
+      location.href = "/home";
+    }
+  }, [status]);
+
+  // Render children only if not logged in, otherwise render null (or loading)
+  return status !== "LOGGED_IN" ? children : null;
+}
+
+// LoginStartPage is now simpler, focused only on login UI/logic
+function LoginStartPage() {
+  // ... login related logic ONLY ...
+  return <>{/* ... login related components ... */}</>;
+}
+```
+
+#### Recommended Pattern 2: Dedicated Interaction Component
+
+(Dialog logic abstracted into a dedicated `InviteButton` component)
+
+```tsx
+export function FriendInvitation() {
+  const { data } = useQuery(/* ... */);
+
+  return (
+    <>
+      {/* Use the dedicated button component */}
+      <InviteButton name={data.name} />
+      {/* ... other UI ... */}
+    </>
+  );
+}
+
+// InviteButton handles the confirmation flow internally
+function InviteButton({ name }) {
+  const handleClick = async () => {
+    const canInvite = await overlay.openAsync(({ isOpen, close }) => (
+      <ConfirmDialog
+        title={`Share with ${name}`}
+        // ... dialog setup ...
+      />
+    ));
+
+    if (canInvite) {
+      await sendPush();
+    }
+  };
+
+  return <Button onClick={handleClick}>Invite</Button>;
+}
+```
+
+#### Avoid:
+
+```tsx
+function LoginStartPage() {
+  // Mixed concerns: auth checking + login logic
+  useCheckLogin({
+    onChecked: (status) => {
+      if (status === "LOGGED_IN") {
+        location.href = "/home";
+      }
+    }
+  });
+
+  // login logic...
+  return <>{/* login components */}</>;
+}
+```

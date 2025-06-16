@@ -1,0 +1,87 @@
+---
+description: Functions that perform similar operations should return consistent types across the codebase.
+globs: 
+alwaysApply: false
+---
+## Unify Return Types for Similar Functions
+
+**Rule:** Functions that perform similar operations should return consistent types across the codebase.
+
+**Reasoning:**
+
+- Improves code predictability for team members
+- Reduces the need to check return types repeatedly
+- Prevents runtime errors from inconsistent type handling
+
+#### Recommended Pattern 1: API Hooks (React Query)
+
+```typescript
+// Always return the Query object
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
+
+// Assuming fetchUser returns Promise<UserType>
+function useUser(): UseQueryResult<UserType, Error> {
+  const query = useQuery({ queryKey: ["user"], queryFn: fetchUser });
+  return query;
+}
+
+// Assuming fetchServerTime returns Promise<Date>
+function useServerTime(): UseQueryResult<Date, Error> {
+  const query = useQuery({
+    queryKey: ["serverTime"],
+    queryFn: fetchServerTime,
+  });
+  return query;
+}
+```
+
+#### Recommended Pattern 2: Validation Functions
+
+(Using a consistent type, ideally a Discriminated Union)
+
+```typescript
+type ValidationResult = { ok: true } | { ok: false; reason: string };
+
+function checkIsNameValid(name: string): ValidationResult {
+  if (name.length === 0) return { ok: false, reason: "Name cannot be empty." };
+  if (name.length >= 20)
+    return { ok: false, reason: "Name cannot be longer than 20 characters." };
+  return { ok: true };
+}
+
+function checkIsAgeValid(age: number): ValidationResult {
+  if (!Number.isInteger(age))
+    return { ok: false, reason: "Age must be an integer." };
+  if (age < 18) return { ok: false, reason: "Age must be 18 or older." };
+  if (age > 99) return { ok: false, reason: "Age must be 99 or younger." };
+  return { ok: true };
+}
+
+// Usage allows safe access to 'reason' only when ok is false
+const nameValidation = checkIsNameValid(name);
+if (!nameValidation.ok) {
+  console.error(nameValidation.reason);
+}
+```
+
+#### Avoid:
+
+```typescript
+// Inconsistent return types
+function useUser() {
+  return useQuery({...}); // Returns Query object
+}
+
+function useServerTime() {
+  const query = useQuery({...});
+  return query.data; // Returns data only
+}
+
+function checkIsNameValid(name: string) {
+  return name.length > 0; // Returns boolean
+}
+
+function checkIsAgeValid(age: number) {
+  return { ok: true, reason: "..." }; // Returns object
+}
+```

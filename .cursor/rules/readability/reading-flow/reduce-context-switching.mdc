@@ -1,0 +1,58 @@
+---
+description: Structure code to flow naturally from top to bottom, minimizing the need to jump between different sections.
+globs: 
+alwaysApply: false
+---
+## Reduce Context Switching
+
+**Rule:** Structure code to flow naturally from top to bottom, minimizing the need to jump between different sections.
+
+**Reasoning:**
+
+- Reduces cognitive load by maintaining linear reading flow
+- Keeps related logic close together
+- Improves code comprehension and maintenance
+
+#### Recommended Pattern:
+
+```typescript
+function UserProfile() {
+  // 1. Data fetching at the top
+  const { user, isLoading } = useUser();
+  
+  // 2. Early returns for loading/error states
+  if (isLoading) return <LoadingSpinner />;
+  if (!user) return <ErrorMessage />;
+  
+  // 3. Main logic flows naturally
+  const canEdit = user.role === 'admin';
+  
+  // 4. Render logic at the bottom
+  return (
+    <div>
+      <UserInfo user={user} />
+      {canEdit && <EditButton />}
+    </div>
+  );
+}
+```
+
+#### Avoid:
+
+```typescript
+function UserProfile() {
+  const { user, isLoading } = useUser();
+  
+  // Logic scattered requiring mental jumping
+  const canEdit = user?.role === 'admin';
+  
+  if (isLoading) return <LoadingSpinner />;
+  
+  // More logic mixed with conditions
+  const displayName = user?.name || 'Unknown';
+  
+  if (!user) return <ErrorMessage />;
+  
+  return <div>{/* components */}</div>;
+}
+```

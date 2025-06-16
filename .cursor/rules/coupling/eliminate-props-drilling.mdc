@@ -1,0 +1,79 @@
+---
+description: Avoid passing props through multiple component layers that don't use them directly.
+globs: 
+alwaysApply: false
+---
+## Eliminate Props Drilling
+
+**Rule:** Avoid passing props through multiple component layers that don't use them directly.
+
+**Reasoning:**
+
+- Reduces coupling between parent and child components
+- Minimizes the scope of changes when props are modified
+- Eliminates unnecessary intermediate abstractions
+
+**Alternative Solutions:**
+- Use composition pattern for component structure
+- Consider React Context for deeply nested shared state
+- Extract components that actually use the props
+
+#### Recommended Pattern:
+
+```tsx
+// Composition pattern - direct prop usage
+function ItemEditModal({ open, items, recommendedItems, onConfirm, onClose }) {
+  const [keyword, setKeyword] = useState("");
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Input
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+        <Button onClick={onClose}>Close</Button>
+      </div>
+      <ItemEditList
+        keyword={keyword}
+        items={items}
+        recommendedItems={recommendedItems}
+        onConfirm={onConfirm}
+      />
+    </Modal>
+  );
+}
+```
+
+#### Avoid:
+
+```tsx
+// Props drilling through intermediate components
+function ItemEditModal({ open, items, recommendedItems, onConfirm, onClose }) {
+  const [keyword, setKeyword] = useState("");
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <ItemEditBody
+        items={items}          // Drilling through
+        keyword={keyword}      // Drilling through
+        recommendedItems={recommendedItems}  // Drilling through
+        onConfirm={onConfirm} // Drilling through
+        onClose={onClose}     // Drilling through
+      />
+    </Modal>
+  );
+}
+
+function ItemEditBody({ keyword, items, recommendedItems, onConfirm, onClose }) {
+  // Just passing props down again - unnecessary layer
+  return (
+    <ItemEditList
+      keyword={keyword}
+      items={items}
+      recommendedItems={recommendedItems}
+      onConfirm={onConfirm}
+    />
+  );
+}
+```

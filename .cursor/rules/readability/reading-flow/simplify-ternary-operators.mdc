@@ -1,0 +1,53 @@
+---
+description: Break down complex or nested ternary operators into simpler, more readable conditional statements.
+globs: 
+alwaysApply: false
+---
+## Simplify Ternary Operators
+
+**Rule:** Break down complex or nested ternary operators into simpler, more readable conditional statements.
+
+**Reasoning:**
+
+- Reduces cognitive load when reading complex conditions
+- Improves debugging and maintenance
+- Makes code intent clearer
+
+**Guidelines:**
+- Use simple ternaries for straightforward conditions
+- Convert nested ternaries to if-else statements
+- Consider early returns for cleaner flow
+
+#### Recommended Pattern:
+
+```typescript
+function StatusMessage({ status, user }) {
+  if (status === 'loading') {
+    return <LoadingSpinner />;
+  }
+  
+  if (status === 'error') {
+    return <ErrorMessage />;
+  }
+  
+  if (!user) {
+    return <LoginPrompt />;
+  }
+  
+  return <WelcomeMessage user={user} />;
+}
+```
+
+#### Avoid:
+
+```typescript
+function StatusMessage({ status, user }) {
+  return status === 'loading' 
+    ? <LoadingSpinner />
+    : status === 'error'
+    ? <ErrorMessage />
+    : !user
+    ? <LoginPrompt />
+    : <WelcomeMessage user={user} />;
+}
+```

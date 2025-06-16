@@ -1,0 +1,41 @@
+---
+description: Replace magic numbers with named constants for clarity.
+globs: 
+alwaysApply: false
+---
+## Name Magic Numbers
+
+**Rule:** Replace magic numbers with named constants for clarity.
+
+**Reasoning:**
+
+- Improves clarity by giving semantic meaning to unexplained values
+- Enhances maintainability by centralizing constant values
+- Makes code self-documenting
+
+**Guidelines:**
+- Use descriptive names that explain the purpose
+- Include units in the name (MS, PX, PERCENT, etc.)
+- Group related constants together
+
+#### Recommended Pattern:
+
+```typescript
+const ANIMATION_DELAY_MS = 300;
+
+async function onLikeClick() {
+  await postLike(url);
+  await delay(ANIMATION_DELAY_MS); // Clearly indicates waiting for animation
+  await refetchPostLike();
+}
+```
+
+#### Avoid:
+
+```typescript
+async function onLikeClick() {
+  await postLike(url);
+  await delay(300); // What does 300 represent?
+  await refetchPostLike();
+}
+```

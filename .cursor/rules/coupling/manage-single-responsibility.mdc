@@ -1,0 +1,67 @@
+---
+description: Avoid creating functions, components, or hooks that handle multiple unrelated responsibilities.
+globs: 
+alwaysApply: false
+---
+## Manage Single Responsibility
+
+**Rule:** Avoid creating functions, components, or hooks that handle multiple unrelated responsibilities.
+
+**Reasoning:**
+
+- Reduces the scope of impact when making changes
+- Prevents unintended consequences from modifications
+- Improves maintainability and testability
+
+**Benefits:**
+- Narrow scope of impact when changing code
+- Components depend only on what they need
+- Easier to test individual responsibilities
+
+#### Recommended Pattern:
+
+```typescript
+// Separate hooks for individual responsibilities
+export function useCardIdQueryParam() {
+  const [cardId, _setCardId] = useQueryParam("cardId", NumberParam);
+
+  const setCardId = useCallback((cardId: number) => {
+    _setCardId(cardId, "replaceIn");
+  }, [_setCardId]);
+
+  return [cardId ?? undefined, setCardId] as const;
+}
+
+export function useDateRangeQueryParam() {
+  const [dateFrom, setDateFrom] = useQueryParam("dateFrom", DateParam);
+  const [dateTo, setDateTo] = useQueryParam("dateTo", DateParam);
+
+  return {
+    dateFrom: dateFrom ?? defaultDateFrom,
+    dateTo: dateTo ?? defaultDateTo,
+    setDateFrom,
+    setDateTo
+  };
+}
+```
+
+#### Avoid:
+
+```typescript
+// Single hook managing all page state
+export function usePageState() {
+  const [query, setQuery] = useQueryParams({
+    cardId: NumberParam,
+    statementId: NumberParam,
+    dateFrom: DateParam,
+    dateTo: DateParam,
+    statusList: ArrayParam // Too many responsibilities
+  });
+
+  return {
+    // Complex object with many unrelated properties
+    values: { /* all values */ },
+    controls: { /* all setters */ }
+  };
+}
+```

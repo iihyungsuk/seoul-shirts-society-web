@@ -1,0 +1,57 @@
+---
+description: Split components or functions that handle different execution paths into separate, focused units.
+globs: 
+alwaysApply: false
+---
+## Separate Code That Doesn't Execute Together
+
+**Rule:** Split components or functions that handle different execution paths into separate, focused units.
+
+**Reasoning:**
+
+- Reduces the number of contexts readers need to consider simultaneously
+- Eliminates branches scattered throughout code
+- Makes each component responsible for a single execution path
+
+#### Recommended Pattern:
+
+```tsx
+// Instead of mixed execution paths in one component
+function SubmitButton() {
+  const isViewer = useRole() === "viewer";
+
+  return isViewer ? <ViewerSubmitButton /> : <AdminSubmitButton />;
+}
+
+function ViewerSubmitButton() {
+  return <TextButton disabled>Submit</TextButton>;
+}
+
+function AdminSubmitButton() {
+  useEffect(() => {
+    showAnimation();
+  }, []);
+
+  return <Button type="submit">Submit</Button>;
+}
+```
+
+#### Avoid:
+
+```tsx
+// Mixed execution paths make code harder to follow
+function SubmitButton() {
+  const isViewer = useRole() === "viewer";
+
+  useEffect(() => {
+    if (isViewer) return; // Conditional execution
+    showButtonAnimation();
+  }, [isViewer]);
+
+  return isViewer ? (
+    <TextButton disabled>Submit</TextButton>
+  ) : (
+    <Button type="submit">Submit</Button>
+  );
+}
+```

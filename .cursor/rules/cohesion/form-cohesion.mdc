@@ -1,0 +1,75 @@
+---
+description: Design form validation cohesion based on the unit of change - field-level for independent changes, form-level for interdependent changes.
+globs: 
+alwaysApply: false
+---
+## Form Cohesion Strategy
+
+**Rule:** Design form validation cohesion based on the unit of change - field-level for independent changes, form-level for interdependent changes.
+
+**Reasoning:**
+
+- Ensures related validation logic changes together
+- Reduces coupling when fields are independent
+- Improves maintainability by matching cohesion to change patterns
+
+**Choose Field-Level When:**
+- Fields have independent validation logic
+- Reusability across forms is important
+- Asynchronous validation is needed per field
+
+**Choose Form-Level When:**
+- Fields represent a single business function
+- Step-by-step wizard forms
+- Fields are interdependent
+
+#### Field-Level Cohesion (Independent Fields):
+
+```tsx
+export function Form() {
+  const { register, formState: { errors }, handleSubmit } = useForm();
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input
+        {...register("name", {
+          validate: (value) =>
+            isEmptyStringOrNil(value) ? "Please enter your name." : ""
+        })}
+      />
+      
+      <input
+        {...register("email", {
+          validate: (value) => {
+            if (isEmptyStringOrNil(value)) return "Please enter your email.";
+            if (!emailRegex.test(value)) return "Invalid email format.";
+            return "";
+          }
+        })}
+      />
+    </form>
+  );
+}
+```
+
+#### Form-Level Cohesion (Interdependent Fields):
+
+```tsx
+const schema = z.object({
+  name: z.string().min(1, "Please enter your name."),
+  email: z.string().min(1, "Please enter your email.").email("Invalid email.")
+});
+
+export function Form() {
+  const { register, formState: { errors }, handleSubmit } = useForm({
+    resolver: zodResolver(schema)
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register("name")} />
+      <input {...register("email")} />
+    </form>
+  );
+}
+```

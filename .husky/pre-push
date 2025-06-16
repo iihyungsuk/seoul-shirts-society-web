@@ -1,0 +1,11 @@
+# Run the full Next.js build
+echo "Running full Next.js build before push..."
+pnpm build
+
+# Check the exit status of the build command
+if [ $? -ne 0 ]; then
+  echo "Build failed. Push aborted."
+  exit 1
+fi
+
+echo "Build successful. Proceeding with push."

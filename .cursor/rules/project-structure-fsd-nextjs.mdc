@@ -1,0 +1,72 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# FSD + Next.js App Router Project Structure
+
+This project uses Feature-Sliced Design (FSD) methodology with Next.js App Router. The structure resolves conflicts between FSD principles and Next.js requirements.
+
+## Root Level Structure
+
+```
+├── app/                 # Next.js App Router folder (routing only)
+├── pages/               # Stub Next.js pages folder (for compatibility)
+│   └── README.md        # Explanation of folder purpose
+├── src/                 # FSD structure lives here
+│   ├── app/             # FSD app layer (providers, global setup)
+│   ├── pages/           # FSD pages layer (business logic pages)
+│   ├── widgets/         # FSD widgets layer (composite UI blocks)
+│   ├── features/        # FSD features layer (user interactions)
+│   ├── entities/        # FSD entities layer (business entities)
+│   └── shared/          # FSD shared layer (reusable resources)
+├── middleware.ts        # Next.js middleware (must be at root)
+└── ...config files
+```
+
+## Key Principles
+
+1. **Routing Separation**: Next.js App Router handles routing in `/app`, while FSD pages contain business logic in `/src/pages`
+2. **Import Direction**: Next.js route files import from FSD pages, not the other way around
+3. **Middleware Location**: Next.js middleware must stay at project root
+4. **Clean Architecture**: Each FSD layer follows import rules (higher layers can import from lower layers)
+
+## Layer Responsibilities
+
+### `/app` (Next.js App Router)
+- Contains only routing files (`page.tsx`, `layout.tsx`, `loading.tsx`, etc.)
+- Imports and renders components from `/src/pages`
+- Handles Next.js specific routing features
+
+### `/src/app` (FSD App Layer)
+- Global providers (React Query, Zustand stores)
+- Global styles and configurations
+- Application-wide setup and initialization
+
+### `/src/pages` (FSD Pages Layer)
+- Complete page business logic
+- Orchestrates widgets, features, and entities
+- Page-specific logic and data fetching
+
+### `/src/widgets` (FSD Widgets Layer)
+- Composite UI blocks (Header, Sidebar, ProductCard, etc.)
+- Can use multiple features and entities
+- Reusable across different pages
+
+### `/src/features` (FSD Features Layer)
+- User interaction features (LoginForm, AddToCart, etc.)
+- Self-contained functionality
+- Can use entities and shared resources
+
+### `/src/entities` (FSD Entities Layer)
+- Business entities (User, Product, Order, etc.)
+- Entity-specific API calls and data models
+- Can only use shared resources
+
+### `/src/shared` (FSD Shared Layer)
+- Reusable utilities, components, and configurations
+- UI kit components
+- API clients and common utilities
+- Cannot import from any other layer
+
+This structure maintains Next.js App Router functionality while following FSD architectural principles.

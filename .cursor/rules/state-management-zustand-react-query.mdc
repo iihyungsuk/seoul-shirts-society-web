@@ -1,0 +1,48 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# State Management: Zustand + React Query in FSD
+
+Client state (Zustand) and server state (React Query) organization within FSD architecture.
+
+## Distribution
+
+### Client State (Zustand)
+- **Global**: `/src/shared/stores/`
+- **Feature-specific**: `/src/features/{feature}/model/`
+- **Entity-specific**: `/src/entities/{entity}/model/`
+
+### Server State (React Query)
+- **Query factories**: `/src/entities/{entity}/api/`
+- **Mutations**: `/src/features/{feature}/api/`
+
+## Structure
+
+```
+src/
+├── app/providers/
+│   ├── query-provider.tsx
+│   └── store-provider.tsx
+├── entities/{entity}/
+│   ├── api/{entity}.queries.ts
+│   └── model/{entity}.store.ts
+├── features/{feature}/
+│   ├── api/use-{action}.ts
+│   └── model/{feature}.store.ts
+└── shared/
+    ├── api/query-client.ts
+    └── stores/auth.store.ts
+```
+
+## Usage Guidelines
+
+1. **State Separation**: Keep client state (UI, forms, local data) in Zustand, server state (API data) in React Query
+2. **Store Scope**: Use global stores sparingly, prefer feature/entity-specific stores
+3. **Query Organization**: Group queries by entity, use query factories for type safety
+4. **Mutation Placement**: Place mutations close to the features that use them
+5. **Provider Setup**: Initialize all providers in the FSD app layer
+6. **Store Persistence**: Only persist critical user data (auth, preferences)
+
+This organization ensures clear separation of concerns while maintaining FSD architectural principles.

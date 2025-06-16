@@ -1,0 +1,65 @@
+---
+description: Separate functions that handle multiple different logic types into focused, single-purpose functions.
+globs: 
+alwaysApply: false
+---
+## Split Functions Combined by Logic Type
+
+**Rule:** Separate functions that handle multiple different logic types into focused, single-purpose functions.
+
+**Reasoning:**
+
+- Improves cohesion by keeping related logic together
+- Reduces context switching when reading code
+- Makes functions easier to test and maintain
+
+#### Recommended Pattern:
+
+```tsx
+function FriendInvitation() {
+  const { data } = useQuery(/* ... */);
+
+  return (
+    <>
+      <InviteButton name={data.name} />
+      {/* Other UI components */}
+    </>
+  );
+}
+
+function InviteButton({ name }) {
+  return (
+    <Button
+      onClick={async () => {
+        const canInvite = await showConfirmDialog(name);
+        if (canInvite) {
+          await sendPush();
+        }
+      }}
+    >
+      Invite
+    </Button>
+  );
+}
+```
+
+#### Avoid:
+
+```tsx
+function FriendInvitation() {
+  // Mixed logic: UI state + complex interaction logic
+  const handleClick = async () => {
+    const canInvite = await overlay.openAsync(/* complex dialog logic */);
+    if (canInvite) {
+      await sendPush();
+    }
+  };
+
+  return (
+    <>
+      <Button onClick={handleClick}>Invite</Button>
+      {/* UI scattered far from related logic */}
+    </>
+  );
+}
+```

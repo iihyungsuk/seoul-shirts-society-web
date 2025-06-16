@@ -1,0 +1,54 @@
+---
+description: Place source files that are modified together in the same directory structure.
+globs: 
+alwaysApply: false
+---
+## File Organization for Cohesion
+
+**Rule:** Place source files that are modified together in the same directory structure.
+
+**Reasoning:**
+
+- Clearly reveals code dependencies
+- Prevents unauthorized references between unrelated modules
+- Enables clean deletion of entire feature sets
+- Reduces complexity as projects grow
+
+**Benefits:**
+- Easy to identify wrong imports: `import { useFoo } from '../../../OtherDomain/hooks/useFoo'`
+- Clean feature deletion by removing entire directories
+- Clear domain boundaries
+
+#### Recommended Pattern:
+
+```text
+└─ src
+   │  // Global, shared code
+   ├─ components
+   ├─ hooks
+   ├─ utils
+   │
+   └─ domains
+      │  // Domain-specific code
+      ├─ UserManagement
+      │     ├─ components
+      │     ├─ hooks
+      │     ├─ utils
+      │     └─ types
+      │
+      └─ ProductCatalog
+            ├─ components
+            ├─ hooks
+            ├─ utils
+            └─ types
+```
+
+#### Avoid:
+
+```text
+└─ src
+   ├─ components    // All components mixed together
+   ├─ hooks         // All hooks mixed together
+   ├─ utils         // All utilities mixed together
+   └─ constants     // All constants mixed together
+```

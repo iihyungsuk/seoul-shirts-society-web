@@ -1,0 +1,53 @@
+---
+description: Functions should only contain logic that can be predicted from their name, parameters, and return type.
+globs: 
+alwaysApply: false
+---
+## Expose Hidden Logic
+
+**Rule:** Functions should only contain logic that can be predicted from their name, parameters, and return type.
+
+**Reasoning:**
+
+- Improves function predictability for collaborators
+- Prevents unexpected side effects
+- Makes debugging easier when issues occur
+
+**Guidelines:**
+- Function names should accurately reflect all behavior
+- Side effects should be explicit at call sites
+- Keep functions focused on their primary purpose
+
+#### Recommended Pattern:
+
+```typescript
+// Clear, predictable function
+async function fetchBalance(): Promise<number> {
+  const balance = await http.get<number>("...");
+  return balance;
+}
+
+// Explicit logging at call site
+<Button
+  onClick={async () => {
+    const balance = await fetchBalance();
+    logging.log("balance_fetched"); // Explicit side effect
+    await syncBalance(balance);
+  }}
+>
+  Update Account Balance
+</Button>
+```
+
+#### Avoid:
+
+```typescript
+// Hidden side effect not apparent from function signature
+async function fetchBalance(): Promise<number> {
+  const balance = await http.get<number>("...");
+  
+  logging.log("balance_fetched"); // Hidden behavior
+  
+  return balance;
+}
+```

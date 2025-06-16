@@ -1,0 +1,68 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# FSD Segment Organization & Public API
+
+How to organize segments within FSD slices and establish proper public APIs.
+
+## Standard Segment Structure
+
+```
+{layer}/
+├──{slice}/
+│   ├── ui/                    # UI components
+│   ├── api/                   # Server interaction logic  
+│   ├── model/                 # Business logic and state
+│   ├── lib/                   # Slice-specific utilities
+│   ├── config/                # Slice-specific configuration
+│   └── index.ts               # Public API (barrel export)
+```
+
+## Segment Responsibilities
+
+- **`ui/`**: React components and styles
+- **`api/`**: React Query queries/mutations, API functions
+- **`model/`**: Zustand stores, types, business logic  
+- **`lib/`**: Pure functions, formatters, validators
+- **`config/`**: Constants and configurations
+
+## Public API Pattern (`index.ts`)
+
+Each slice must expose functionality through a public API:
+
+```typescript
+// src/entities/user/index.ts
+
+// Export types (always)
+export type { User, UserFilters } from './model/types'
+
+// Export UI components
+export { UserCard, UserList } from './ui'
+
+// Export API queries (for cross-layer usage)
+export { userQueries } from './api'
+
+// Export stores (for cross-layer usage)  
+export { useUserStore } from './model'
+
+// DO NOT export internal implementation details
+// DO NOT export API functions directly (only queries)
+```
+
+## Import Rules
+
+```typescript
+// ✅ Correct - use public API
+import { UserCard, type User } from '@/src/entities/user'
+
+// ❌ Wrong - direct segment import
+import { UserCard } from '@/src/entities/user/ui/user-card'
+```
+
+## Guidelines
+
+1. **Public API First**: Design the public API (`index.ts`) before implementing segments
+2. **Minimal Exposure**: Only export what other layers need
+3. **No Deep Imports**: Always use the public API, never import from segments directly

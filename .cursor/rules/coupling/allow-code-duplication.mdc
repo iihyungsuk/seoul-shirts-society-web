@@ -1,0 +1,78 @@
+---
+description: Sometimes duplicating code is better than creating shared abstractions that increase coupling.
+globs: 
+alwaysApply: false
+---
+## Allow Code Duplication
+
+**Rule:** Sometimes duplicating code is better than creating shared abstractions that increase coupling.
+
+**Reasoning:**
+
+- Prevents tight coupling between unrelated features
+- Reduces the scope of impact when making changes
+- Avoids complex abstractions for simple, different behaviors
+
+**Guidelines:**
+- Duplicate when behaviors will likely diverge
+- Extract only when behavior is truly identical
+- Consider the cost of maintaining complex abstractions
+
+#### Consider Duplication When:
+
+```typescript
+// Different pages with similar but distinct needs
+function Page1MaintenanceCheck() {
+  const logger = useLogger();
+  const bottomSheet = useMaintenanceBottomSheet();
+
+  const handleMaintenance = async (info) => {
+    logger.log("Page1 maintenance opened"); // Different log message
+    const result = await bottomSheet.open(info);
+    if (result) {
+      logger.log("Page1 maintenance notification clicked");
+    }
+    // No screen closing needed for Page1
+  };
+
+  return <button onClick={handleMaintenance}>Check Maintenance</button>;
+}
+
+function Page2MaintenanceCheck() {
+  const logger = useLogger();
+  const bottomSheet = useMaintenanceBottomSheet();
+
+  const handleMaintenance = async (info) => {
+    logger.log("Page2 maintenance opened"); // Different log message
+    const result = await bottomSheet.open(info);
+    if (result) {
+      logger.log("Page2 maintenance notification clicked");
+    }
+    closeView(); // Page2 needs to close the screen
+  };
+
+  return <button onClick={handleMaintenance}>Check Maintenance</button>;
+}
+```
+
+#### Avoid Premature Abstraction:
+
+```typescript
+// Complex hook trying to handle all variations
+export const useOpenMaintenanceBottomSheet = (
+  logPrefix: string,
+  shouldCloseView: boolean,
+  customBehavior?: () => void
+) => {
+  // Complex logic to handle all cases
+  return async (maintainingInfo) => {
+    logger.log(`${logPrefix} maintenance opened`);
+    const result = await maintenanceBottomSheet.open(maintainingInfo);
+    if (result) {
+      logger.log(`${logPrefix} maintenance notification clicked`);
+    }
+    if (shouldCloseView) closeView();
+    customBehavior?.();
+  };
+};
+```

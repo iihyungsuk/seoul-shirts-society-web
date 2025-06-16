@@ -1,0 +1,56 @@
+---
+description: Functions or variables with the same name should have the same behavior across the codebase.
+globs: 
+alwaysApply: false
+---
+## Manage Naming Duplication
+
+**Rule:** Functions or variables with the same name should have the same behavior across the codebase.
+
+**Reasoning:**
+
+- Prevents confusion and misunderstanding of function behavior
+- Improves code predictability and reduces debugging complexity
+- Makes code more intuitive for team members
+
+**Guidelines:**
+- Use descriptive names that indicate additional behavior
+- Avoid shadowing library function names
+- Make function names reflect their actual implementation
+
+#### Recommended Pattern:
+
+```typescript
+// httpService.ts - Clear, distinct naming
+import { http as httpLibrary } from "@some-library/http";
+
+export const httpService = {
+  async getWithAuth(url: string) {
+    const token = await fetchToken();
+    return httpLibrary.get(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+};
+
+// fetchUser.ts
+import { httpService } from "./httpService";
+
+export async function fetchUser() {
+  return await httpService.getWithAuth("...");
+}
+```
+
+#### Avoid:
+
+```typescript
+// Confusing naming - same name, different behavior
+export const http = {
+  async get(url: string) {
+    const token = await fetchToken(); // Hidden behavior
+    return httpLibrary.get(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+};
+```

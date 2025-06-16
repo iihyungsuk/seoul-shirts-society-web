@@ -1,0 +1,145 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# FSD Import Hierarchy & Dependency Rules
+
+This rule defines the strict import hierarchy and dependency rules for Feature-Sliced Design architecture to maintain clean architecture principles.
+
+## Layer Hierarchy & Import Rules
+
+```
+App Router (/app)
+  ↓ ONLY from Pages
+
+Pages (/src/pages)
+  ↓ from Widgets, Features, Entities, Shared
+
+Widgets (/src/widgets)
+  ↓ from Features, Entities, Shared
+
+Features (/src/features)
+  ↓ from Entities, Shared
+
+Entities (/src/entities)
+  ↓ from Shared only
+
+Shared (/src/shared)
+  ↓ external libraries only
+```
+
+## Core Rules
+
+1. **Downward Only**: Higher layers import from lower layers, never reverse
+2. **Public API**: Always import through `index.ts`, never from internal segments  
+3. **No Circular**: Avoid circular dependencies between slices
+
+### State Sharing Between Layers
+```typescript
+// ❌ Wrong: Direct state sharing
+// features/cart/model/cart.store.ts
+import { useUserStore } from '@/src/entities/user'  // ❌ Cross-layer state coupling
+
+// ✅ Correct: Props/parameters passing
+// widgets/cart/ui/cart-widget.tsx
+export const CartWidget = ({ user }: { user: User }) => {
+  const { items } = useCartStore()
+  // Use user prop instead of direct store access
+}
+```
+
+### Event Communication
+```typescript
+// ✅ Use callbacks for upward communication
+// features/auth/ui/login-form.tsx
+interface LoginFormProps {
+  onLoginSuccess: (user: User) => void
+  onLoginFailure: (error: Error) => void
+}
+
+export const LoginForm = ({ onLoginSuccess, onLoginFailure }: LoginFormProps) => {
+  // Component implementation
+}
+```
+
+### Data Flow Through Layers
+```typescript
+// ✅ Correct data flow
+// pages/product/ui/product-page.tsx
+export const ProductPage = ({ productId }: { productId: string }) => {
+  // Page gets data
+  const { data: product } = useQuery(productQueries.detail(productId))
+  
+  return (
+    <div>
+      {/* Pass data down to widgets */}
+      <ProductWidget 
+        product={product} 
+        onAddToCart={(product) => {
+          // Handle cart action
+        }}
+      />
+    </div>
+  )
+}
+```
+
+## Common Anti-Patterns to Avoid
+
+### 1. Layer Skipping
+```typescript
+// ❌ Wrong: Page directly importing entity UI
+import { UserCard } from '@/src/entities/user'
+
+// ✅ Correct: Use widget layer
+import { UserProfile } from '@/src/widgets/user-profile'
+```
+
+### 2. Feature-to-Feature Direct Communication
+```typescript
+// ❌ Wrong: Direct feature coupling
+import { useCartStore } from '@/src/features/cart'
+
+// ✅ Correct: Communicate through higher layer (widget/page)
+const CartPage = () => {
+  const cart = useCartStore()
+  const auth = useAuthStore()
+  
+  return (
+    <CartWidget 
+      items={cart.items}
+      user={auth.user}
+      onCheckout={(items, user) => {
+        // Coordinate features at page level
+      }}
+    />
+  )
+}
+```
+
+### 3. Shared Layer Contamination
+```typescript
+// ❌ Wrong: Business logic in shared
+// shared/lib/user-business-logic.ts
+export const calculateUserRewards = (user: User) => {
+  // This belongs in entities/user/lib/
+}
+
+// ✅ Correct: Keep shared generic
+// shared/lib/array-utils.ts
+export const groupBy = <T>(array: T[], key: keyof T) => {
+  // Generic utility function
+}
+```
+
+## Guidelines for Clean Dependencies
+
+1. **Think in Abstractions**: Higher layers should work with abstractions, not concrete implementations
+2. **Minimize Coupling**: Reduce dependencies between same-level slices
+3. **Use Composition**: Compose functionality at higher layers rather than creating tight coupling
+4. **Event-Driven Communication**: Use callbacks and events for upward communication
+5. **Data Flow Clarity**: Always pass data down, send events up
+6. **Dependency Injection**: Use dependency injection for cross-cutting concerns
+
+Following these rules ensures maintainable, testable, and scalable architecture that aligns with FSD principles.
