@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Seoul Shirts Society
 
-## Getting Started
+미니멀하고 현대적인 티셔츠 판매 웹사이트입니다. 세로로 긴 흰색 티셔츠 이미지를 배경으로 사용하며, 티셔츠 내부 영역 안에 판매 상품 카드들이 나열됩니다.
 
-First, run the development server:
+## 기술 스택
+
+- Next.js 15 (App Router)
+- React 19 + TypeScript
+- 상태 관리: React Query (서버 상태), Zustand (클라이언트 상태)
+- Tailwind CSS
+- FSD (Feature-Sliced Design) 아키텍처
+
+## 주요 기능
+
+- 홈페이지 (티셔츠 목록)
+- 제품 상세 페이지
+- 장바구니 기능
+
+## 로컬 개발 환경 설정
+
+1. 저장소 클론
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/seoul-shirts-society-web.git
+cd seoul-shirts-society-web
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. 의존성 설치
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. 개발 서버 실행
 
-## Learn More
+```bash
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. 브라우저에서 http://localhost:3000 접속
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 빌드 및 배포
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+프로덕션 빌드:
 
-## Deploy on Vercel
+```bash
+pnpm build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+빌드 결과물 실행:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm start
+```
+
+## 프로젝트 구조 (FSD)
+
+```
+app/               # Next.js App Router (route files만)
+src/
+  app/             # 글로벌 providers, 스타일, 설정
+  pages/           # FSD 'pages' layer (비즈니스 로직)
+  widgets/         # Composite UI 블록
+  features/        # 사용자 상호작용 단위
+  entities/        # 비즈니스 엔티티
+  shared/          # 재사용 리소스(유틸, UI 키트 등)
+```
+
+## 라이센스
+
+MIT
