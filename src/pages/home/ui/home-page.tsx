@@ -16,7 +16,7 @@ export const HomePage = () => {
       {/* T-shirt SVG Background */}
       <div className="relative -ml-[40vw] w-[180vw]">
         <Image
-          src="/images/bg-tshirt.png"
+          src="/images/bg-tshirt-long.png"
           alt="T-shirt"
           width={2000}
           height={2000}
@@ -28,7 +28,7 @@ export const HomePage = () => {
       {/* Content positioned on top of the background */}
       <div className="absolute inset-0 flex flex-col items-center">
         {/* Message positioned on t-shirt */}
-        <div className="mt-[25%] text-center">
+        <div className="mt-[60%] text-center">
           <h1 className="text-3xl font-bold text-neutral-700 md:text-6xl lg:text-7xl">
             This T-shirt is
             <br />
