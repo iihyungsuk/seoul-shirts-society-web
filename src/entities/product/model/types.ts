@@ -9,8 +9,10 @@ export interface Product {
   colors: string[];
 }
 
-export interface ProductFilters {
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
+// Base interface for product with selected options
+// Can be extended by cart, wishlist, order, etc.
+export interface ProductSelection {
+  product: Product;
+  size: string;
+  color: string;
 }

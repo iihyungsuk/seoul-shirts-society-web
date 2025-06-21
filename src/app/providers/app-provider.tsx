@@ -1,5 +1,4 @@
-"use client";
-
+import { LayoutProvider } from "./layout-provider";
 import { QueryProvider } from "./query-provider";
 
 interface AppProviderProps {
@@ -7,5 +6,9 @@ interface AppProviderProps {
 }
 
 export function AppProvider({ children }: AppProviderProps) {
-  return <QueryProvider>{children}</QueryProvider>;
+  return (
+    <QueryProvider>
+      <LayoutProvider>{children}</LayoutProvider>
+    </QueryProvider>
+  );
 }

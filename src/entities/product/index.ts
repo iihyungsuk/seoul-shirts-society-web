@@ -1,8 +1,15 @@
-// Export types
-export type { Product, ProductFilters } from "./model/types";
+export type { Product, ProductSelection } from "./model/types";
 
-// Export API queries
-export { productQueries } from "./api/product.queries";
+export { ProductCard, ProductGrid } from "./ui";
 
-// Export UI components
-export { ProductCard } from "./ui";
+export {
+  useProducts,
+  useProduct,
+  useProductsByCategory,
+} from "./api/product.queries";
+
+export {
+  findProductSelectionIndex,
+  validateProductSelection,
+  formatPrice,
+} from "./lib/product-utils";

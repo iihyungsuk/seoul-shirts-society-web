@@ -5,9 +5,13 @@ import { type Product } from "../model/types";
 
 interface ProductCardProps {
   product: Product;
+  priority?: boolean;
 }
 
-export const ProductCard = ({ product }: ProductCardProps) => {
+export const ProductCard = ({
+  product,
+  priority = false,
+}: ProductCardProps) => {
   return (
     <Link
       href={`/product/${product.id}`}
@@ -23,6 +27,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               fill
               className="object-contain p-2 transition-transform group-hover:scale-105"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+              priority={priority}
+              loading={priority ? "eager" : "lazy"}
             />
           </div>
         </div>
@@ -38,7 +44,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             </h3>
           </div>
           <p className="text-xs text-neutral-600">
-            ${product.price.toFixed(2)}
+            ₩{Math.round(product.price).toLocaleString()}
           </p>
         </div>
       </div>

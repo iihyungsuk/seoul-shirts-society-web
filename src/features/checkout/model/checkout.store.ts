@@ -3,9 +3,7 @@ import { create } from "zustand";
 export interface ShippingAddress {
   fullName: string;
   address: string;
-  city: string;
   postalCode: string;
-  country: string;
   phone: string;
 }
 
@@ -30,9 +28,7 @@ interface CheckoutStore {
 const initialShippingAddress: ShippingAddress = {
   fullName: "",
   address: "",
-  city: "",
   postalCode: "",
-  country: "Korea",
   phone: "",
 };
 

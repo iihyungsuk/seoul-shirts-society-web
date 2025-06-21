@@ -1,1 +1,2 @@
-export { Header } from "./ui";
+export { Header, CartNavIcon } from "./ui";
+export type { HeaderProps, CartNavIconProps } from "./ui";

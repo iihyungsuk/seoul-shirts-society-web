@@ -3,46 +3,116 @@ description:
 globs: 
 alwaysApply: true
 ---
-# State Management: Zustand + React Query in FSD
+# State Management: Zustand + React Query with Woowacon 2023 Architecture
 
-Client state (Zustand) and server state (React Query) organization within FSD architecture.
+Client state (Zustand) and server state (React Query) organization based on Woowacon 2023 presentation, implementing Business Layer and Store Layer concepts within FSD architecture.
 
-## Distribution
+## Woowacon 2023 Layer Architecture
 
-### Client State (Zustand)
-- **Global**: `/src/shared/stores/`
-- **Feature-specific**: `/src/features/{feature}/model/`
-- **Entity-specific**: `/src/entities/{entity}/model/`
+### Business Layer
+Contains business logic and data processing:
+- **hooks/**: Business logic hooks (not utility hooks like useDebounce)
+- **services/**: Helper functions(API success/error handlers, logging functions)
 
-### Server State (React Query)
-- **Query factories**: `/src/entities/{entity}/api/`
-- **Mutations**: `/src/features/{feature}/api/`
+### Store Layer  
+Contains data access and state management:
+- **queries/**: React Query declarations (Server State)
+- **stores/**: Zustand store declarations (Client State)
 
-## Structure
+## Layer Import Rules
+
+**Core Rule: Only import from lower or sibling layers**
+
+- **Business Layer** → **Store Layer** ✅
+- **Store Layer** → **Business Layer** ❌
+- **Component Layer** → **Business Layer**, **Store Layer**
+
+## FSD Integration
 
 ```
 src/
-├── app/providers/
-│   ├── query-provider.tsx
-│   └── store-provider.tsx
-├── entities/{entity}/
-│   ├── api/{entity}.queries.ts
-│   └── model/{entity}.store.ts
 ├── features/{feature}/
-│   ├── api/use-{action}.ts
-│   └── model/{feature}.store.ts
-└── shared/
-    ├── api/query-client.ts
-    └── stores/auth.store.ts
+│   ├── model/
+│   │   ├── hooks/           # Business Layer - 비즈니스 로직 hooks
+│   │   │   ├── use-{feature}-logic.ts
+│   │   │   ├── use-{feature}-operations.ts
+│   │   │   └── index.ts
+│   │   └── stores/          # Store Layer - Client State
+│   │       ├── {feature}.store.ts
+│   │       └── index.ts
+│   ├── lib/                 # Business Layer - services
+│   │   ├── {feature}-service.ts
+│   │   ├── {feature}-handlers.ts
+│   │   └── index.ts
+│   └── api/                 # Store Layer - Server State
+│       ├── use-{action}.ts
+│       └── index.ts
+└── entities/{entity}/
+    ├── model/
+    │   ├── hooks/           # Business Layer - Entity 비즈니스 hooks
+    │   │   ├── use-{entity}-operations.ts
+    │   │   └── index.ts
+    │   └── stores/          # Store Layer - Client State
+    │       ├── {entity}.store.ts
+    │       └── index.ts
+    ├── lib/                 # Business Layer - services
+    │   ├── {entity}-service.ts
+    │   ├── {entity}-utils.ts
+    │   └── index.ts
+    └── api/                 # Store Layer - Server State
+        ├── {entity}.queries.ts
+        └── index.ts
 ```
 
-## Usage Guidelines
+## Best Practices
 
-1. **State Separation**: Keep client state (UI, forms, local data) in Zustand, server state (API data) in React Query
-2. **Store Scope**: Use global stores sparingly, prefer feature/entity-specific stores
-3. **Query Organization**: Group queries by entity, use query factories for type safety
-4. **Mutation Placement**: Place mutations close to the features that use them
-5. **Provider Setup**: Initialize all providers in the FSD app layer
-6. **Store Persistence**: Only persist critical user data (auth, preferences)
+### 1. Layer Responsibility
+- **Component Layer**: UI rendering and user interactions only
+- **Business Layer**: Business logic, data processing, error handling
+- **Store Layer**: Pure data access and state management
 
-This organization ensures clear separation of concerns while maintaining FSD architectural principles.
+### 2. Direct Access on Simple Logic Cases
+Not every piece of logic needs to go through all layers. For simple API calls, components can directly access the Store Layer.
+
+```typescript
+// Simple case - can directly access the store layer.
+const { data } = useQuery(productQueries.detail(productId))
+```
+
+### 3.Complex Business Logics
+Utilize the Business Layer when you need to combine multiple queries and stores for data preprocessing
+
+```typescript
+// features/order/model/hooks/use-order-logic.ts
+export const useOrderLogic = () => {
+  // Combining 4 queries
+  const { data: products } = useQuery(productQueries.all())
+  const { data: user } = useQuery(userQueries.current())
+  const { data: shipping } = useQuery(shippingQueries.rates())
+  const { data: discount } = useQuery(discountQueries.available())
+  
+  // Data preprocessing with business logic
+  const orderData = useMemo(() => 
+    convertToOrderViewModel(products, user, shipping, discount), 
+    [products, user, shipping, discount]
+  )
+  
+  return { orderData }
+}
+```
+
+
+## State Separation
+
+### Server State (React Query)
+- All data fetched from APIs
+- Data requiring caching, synchronization, and background updates
+- Database-stored data
+
+### Client State (Zustand)  
+- UI state (modals, themes, loading)
+- Form state
+- Client-only temporary data
+- User interaction state
+
+**Goal**: Separate concerns properly to achieve maintainable code structure that can respond agilely to business and customer value, rather than focusing on formalities.

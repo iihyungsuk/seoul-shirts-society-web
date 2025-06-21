@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { ReactPlugin } from "@stagewise-plugins/react";
+import { StagewiseToolbar } from "@stagewise/toolbar-next";
+
 import { AppProvider } from "@/app/providers";
 
 import { pretendard } from "./fonts";
@@ -32,6 +35,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${pretendard.variable}`}
     >
       <body className="font-pretendard min-h-screen bg-white text-neutral-900 antialiased">
+        <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
         <AppProvider>{children}</AppProvider>
       </body>
     </html>
