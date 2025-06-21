@@ -1,10 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/shared/ui/button";
 
-export default function CheckoutFailPage() {
+function CheckoutFailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -90,6 +92,27 @@ export default function CheckoutFailPage() {
           <div className="pt-4 text-sm text-neutral-500">
             문제가 지속되면 고객센터로 문의해 주세요.
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CheckoutFailPage() {
+  return (
+    <Suspense fallback={<CheckoutFailLoading />}>
+      <CheckoutFailContent />
+    </Suspense>
+  );
+}
+
+function CheckoutFailLoading() {
+  return (
+    <div className="min-h-screen bg-neutral-50 p-8">
+      <div className="mx-auto max-w-2xl">
+        <div className="flex flex-col items-center justify-center space-y-6 rounded-lg bg-white p-12 text-center shadow-sm">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-900"></div>
+          <h2 className="text-xl font-light text-neutral-700">로딩 중...</h2>
         </div>
       </div>
     </div>

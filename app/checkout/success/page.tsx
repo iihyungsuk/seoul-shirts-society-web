@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCartStore } from "@/entities/cart";
 import { Button } from "@/shared/ui/button";
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { clearCart } = useCartStore();
@@ -191,6 +191,30 @@ export default function CheckoutSuccessPage() {
               <Button>홈으로 가기</Button>
             </Link>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<CheckoutSuccessLoading />}>
+      <CheckoutSuccessContent />
+    </Suspense>
+  );
+}
+
+function CheckoutSuccessLoading() {
+  return (
+    <div className="min-h-screen bg-neutral-50 p-8">
+      <div className="mx-auto max-w-2xl">
+        <div className="flex flex-col items-center justify-center space-y-6 rounded-lg bg-white p-12 text-center shadow-sm">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-900"></div>
+          <h2 className="text-xl font-light text-neutral-700">
+            결제를 확인하는 중입니다...
+          </h2>
+          <p className="text-neutral-600">잠시만 기다려주세요.</p>
         </div>
       </div>
     </div>
